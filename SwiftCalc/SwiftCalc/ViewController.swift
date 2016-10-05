@@ -22,6 +22,14 @@ class ViewController: UIViewController {
     // TODO: This looks like a good place to add some data structures.
     //       One data structure is initialized below for reference.
     var someDataStructure: [String] = [""]
+//    var previous: Int?
+//    var current: Int?
+    var previousString: String?
+    var currentString: String?
+    var currentCount: Int = 0
+    var currentOperator: String? = String()
+    var calculatedValue: String?
+    
     
 
     override func viewDidLoad() {
@@ -46,13 +54,43 @@ class ViewController: UIViewController {
     // TODO: A method to update your data structure(s) would be nice.
     //       Modify this one or create your own.
     func updateSomeDataStructure(_ content: String) {
-        print("Update me like one of those PCs")
+        let cont: String = content
+        if (cont == "+/-" && currentString != nil) {
+            let x: Double = -1 * Double(currentString!)!
+            currentString = x.prettyOutput
+            updateResultLabel(currentString!)
+        } else if (cont == "C") {
+            currentString = nil
+            previousString = nil
+            currentOperator = nil
+            updateResultLabel("0")
+        } else if (previousString == nil && currentString != nil){
+            previousString = currentString
+            currentString = nil
+            currentOperator = cont
+        } else if (cont == "=" && previousString != nil && currentString != nil) {
+            calculatedValue = calculate(a: previousString!, b: currentString!, operation: currentOperator!)
+            updateResultLabel(calculatedValue!)
+            currentOperator = nil
+            previousString = calculatedValue!
+            currentString = nil
+        } else if (currentOperator != nil && previousString != nil && currentString != nil){
+            calculatedValue = calculate(a: previousString!, b: currentString!, operation: currentOperator!)
+            updateResultLabel(calculatedValue!)
+            currentOperator = content
+            previousString = calculatedValue!
+            currentString = nil
+        } else {
+            currentOperator = cont
+        }
+
     }
     
     // TODO: Ensure that resultLabel gets updated.
     //       Modify this one or create your own.
     func updateResultLabel(_ content: String) {
         print("Update me like one of those PCs")
+        resultLabel.text = content
     }
     
     
@@ -64,33 +102,91 @@ class ViewController: UIViewController {
     
     // TODO: A simple calculate method for integers.
     //       Modify this one or create your own.
-    func intCalculate(a: Int, b:Int, operation: String) -> Int {
+    func intCalculate(a: Int, b:Int, operation: String) -> Int? {
         print("Calculation requested for \(a) \(operation) \(b)")
-        return 0
+        if (operation == "+"){
+            return a + b
+        } else if (operation == "-") {
+            return a - b
+        } else if (operation == "%") {
+            return a % b
+        } else if (operation == "/") {
+            return a / b
+        } else {
+            return a * b
+        }
     }
     
     // TODO: A general calculate method for doubles
     //       Modify this one or create your own.
-    func calculate(a: String, b:String, operation: String) -> Double {
+    func calculate(a: String, b:String, operation: String) -> String {
         print("Calculation requested for \(a) \(operation) \(b)")
-        return 0.0
+        let aD: Double = Double(a)!
+        let bD: Double = Double(b)!
+        var calculatedVal: Double
+        if (operation == "+"){
+            calculatedVal = aD + bD
+        } else if (operation == "-") {
+            calculatedVal = aD - bD
+        } else if (operation == "/") {
+            calculatedVal = aD / bD
+        } else {
+            calculatedVal = aD * bD
+        }
+        let str: String = calculatedVal.prettyOutput
+        if (str == "error") {
+            return a
+        } else {
+            return str
+        }
     }
     
     // REQUIRED: The responder to a number button being pressed.
     func numberPressed(_ sender: CustomButton) {
         guard Int(sender.content) != nil else { return }
         print("The number \(sender.content) was pressed")
+        let cont: String = sender.content
+        if (currentCount >= 7) {
+            return
+        }
         // Fill me in!
+        if (currentString == nil) {
+            currentString = cont
+        } else {
+            currentString = currentString! + cont
+        }
+        currentCount = (currentString?.characters.count)!
+        updateResultLabel(currentString!)
     }
     
     // REQUIRED: The responder to an operator button being pressed.
     func operatorPressed(_ sender: CustomButton) {
         // Fill me in!
+        updateSomeDataStructure(sender.content)
     }
     
     // REQUIRED: The responder to a number or operator button being pressed.
     func buttonPressed(_ sender: CustomButton) {
        // Fill me in!
+        let cont: String = sender.content
+        if (currentCount >= 7) {
+            return
+        }
+        if (cont == "0") {
+            if (currentString == nil || currentString == "0") {
+                currentString = cont
+            } else {
+                currentString = currentString! + cont
+            }
+            updateResultLabel(currentString!)
+        } else if (cont == ".") {
+            if (currentString == nil) {
+                currentString = "."
+            } else if (!(currentString?.contains("."))!) {
+                currentString = currentString! + "."
+            }
+        }
+        currentCount = (currentString?.characters.count)!
     }
     
     // IMPORTANT: Do NOT change any of the code below.

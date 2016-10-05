@@ -32,7 +32,23 @@ extension Double {
             3. Display an integer when the result is an integer of allowable size.
             Optional: Use scientific notation for any values that exceed the character max.
         */
-        return "\(self)"
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 6
+        print(self)
+        let tempVar: String = formatter.string(from: NSNumber(value: self))!
+        let decimalChars = tempVar.components(separatedBy: ".")
+        if (decimalChars[0].characters.count >= 6 && decimalChars.count > 1) {
+            return "error"
+        } else if (decimalChars[0].characters.count > 7 && decimalChars.count == 1){
+            return "error"
+        } else if (tempVar.characters.count > 7){
+            return tempVar.substring(to: tempVar.index(tempVar.startIndex, offsetBy: 7))
+        } else {
+            return tempVar
+        }
+        
+        
     }
 }
 
